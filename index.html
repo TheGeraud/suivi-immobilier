@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suivi Achat Immobilier</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="Suivi Immo">
+        <rect x="3" y="14" width="22" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+        <path d="M1 15L14 4L27 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <rect x="10" y="19" width="8" height="7" rx="1" fill="currentColor" opacity="0.3"/>
+      </svg>
+      <span>Suivi Immo · 69 av. Victor Hugo</span>
+    </div>
+    <button data-theme-toggle aria-label="Changer le thème">🌙</button>
+  </header>
+
+  <!-- NAVIGATION -->
+  <nav class="nav">
+    <button class="nav-btn active" data-section="dashboard">🏠 Tableau de bord</button>
+    <button class="nav-btn" data-section="biens">🏡 Biens</button>
+    <button class="nav-btn" data-section="banques">🏦 Banques</button>
+    <button class="nav-btn" data-section="credit">💳 Crédit</button>
+    <button class="nav-btn" data-section="analyse">📊 Analyse</button>
+    <button class="nav-btn" data-section="documents">📋 Documents</button>
+    <button class="nav-btn" data-section="calendrier">📅 Calendrier</button>
+    <button class="nav-btn" data-section="contacts">👥 Contacts</button>
+    <button class="nav-btn" data-section="copro">🏢 Copropriété</button>
+  </nav>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="main" id="app">
+    <!-- Rempli par app.js -->
+  </main>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
