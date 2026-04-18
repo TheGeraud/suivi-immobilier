@@ -159,42 +159,47 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 
 // ── GRAPHIQUE ANALYSE ────────────────────────────────
 function initChartAnalyse() {
+  const notaire = 0.078;
+  const scenarios = [
+    { nom: 'Prudent',   prix: 152000, travaux: 4000, loyer: 900, charges: 984, taxe: 575, energie: 1013 },
+    { nom: 'Équilibré', prix: 156000, travaux: 2500, loyer: 900, charges: 984, taxe: 575, energie: 1013 },
+    { nom: 'Offensif',  prix: 158000, travaux: 1000, loyer: 900, charges: 984, taxe: 575, energie: 1013 },
+  ];
+
+  const labels   = scenarios.map(s => s.nom);
+  const brutData = scenarios.map(s => {
+    const coutTotal = s.prix + s.travaux + Math.round(s.prix * notaire);
+    return +((s.loyer * 12 / coutTotal) * 100).toFixed(2);
+  });
+  const netData  = scenarios.map(s => {
+    const coutTotal = s.prix + s.travaux + Math.round(s.prix * notaire);
+    const charges   = s.charges + s.taxe + s.energie;
+    return +(((s.loyer * 12 - charges) / coutTotal) * 100).toFixed(2);
+  });
+
   const ctx = document.getElementById('chartAnalyse').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
-    data: {
-      labels: ['Prudent', 'Équilibré', 'Offensif'],
+     data: {
+      labels,
       datasets: [
-        {
-          label: 'Rendement brut (%)',
-          data: [5.12, 4.98, 4.91],
-          backgroundColor: 'rgba(1, 105, 111, 0.7)',
-        },
-        {
-          label: 'Rendement net (%)',
-          data: [3.21, 3.10, 3.04],
-          backgroundColor: 'rgba(67, 122, 34, 0.7)',
-        }
+        { label: 'Rendement brut (%)', data: brutData, backgroundColor: 'rgba(1,105,111,0.7)' },
+        { label: 'Rendement net (%)', data: netData, backgroundColor: 'rgba(67,122,34,0.7)' }
       ]
     },
     options: {
       responsive: true,
       plugins: {
         legend: { position: 'top' },
-        title: {
-          display: true,
-          text: 'Comparaison des rendements par scénario'
-        }
+        title: { display: true, text: 'Comparaison des rendements par scénario' }
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { callback: val => val + ' %' }
-        }
+        y: { beginAtZero: true, ticks: { callback: val => val + ' %' } }
       }
     }
   });
 }
+
 
 
 // ── DASHBOARD ─────────────────────────────────────────
