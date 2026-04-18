@@ -18,7 +18,11 @@
       </svg>
       <span>Suivi Immo · 69 av. Victor Hugo</span>
     </div>
-    <button data-theme-toggle aria-label="Changer le thème">🌙</button>
+    <div style="display: flex; gap: 0.5em; align-items: center;">
+      <button id="reset-btn" aria-label="Réinitialiser">↩️</button>
+      <button data-theme-toggle aria-label="Changer le thème">🌙</button>
+    </div>
+    
   </header>
 
   <!-- NAVIGATION -->
@@ -38,6 +42,8 @@
   <main class="main" id="app">
     <!-- Rempli par app.js -->
   </main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script src="app.js"></script>
 

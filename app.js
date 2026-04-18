@@ -112,10 +112,25 @@ const DATA = {
 
 };
 
+// ── CHARGEMENT SAUVEGARDE ────────────────────────────
+const saved = localStorage.getItem('suiviImmo');
+if (saved) {
+  const parsed = JSON.parse(saved);// Cette ligne lit les données sauvegardées dans le navigateur et les transforme de texte en objet JavaScript.
+  Object.assign(DATA.bien, parsed.bien || {});// Résultat : seuls les champs modifiés sont mis à jour, les autres restent avec leurs valeurs par défaut. Pratique pour ajouter de nouveaux champs dans DATA sans écraser les anciennes données.
+  DATA.banques    = parsed.banques    || DATA.banques;
+  DATA.documents  = parsed.documents  || DATA.documents;
+  DATA.calendrier = parsed.calendrier || DATA.calendrier;
+  DATA.contacts   = parsed.contacts   || DATA.contacts;
+}
+
+function save() {
+  localStorage.setItem('suiviImmo', JSON.stringify(DATA)); //Cette fonction enregistre l’objet  DATA  dans le navigateur.  JSON.stringify()  transforme l’objet JavaScript en texte, car  localStorage  ne peut stocker que des chaînes de caractères.
+}
+
 // ── UTILITAIRES ───────────────────────────────────────
 function fmt(n) {
   return Number(n).toLocaleString('fr-FR') + ' €';
-}
+}//
 
 function badgeStatut(statut) {
   const map = {
@@ -133,6 +148,54 @@ function badgeStatut(statut) {
   const cls = map[statut] || 'badge-todo';
   return `<span class="badge ${cls}">${statut}</span>`;
 }
+
+// ── RESET ────────────────────────────────────────────
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (confirm('⚠️ Réinitialiser toutes les données ? Cette action est irréversible.')) {
+    localStorage.removeItem('suiviImmo');
+    location.reload();
+  }
+});
+
+// ── GRAPHIQUE ANALYSE ────────────────────────────────
+function initChartAnalyse() {
+  const ctx = document.getElementById('chartAnalyse').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Prudent', 'Équilibré', 'Offensif'],
+      datasets: [
+        {
+          label: 'Rendement brut (%)',
+          data: [5.12, 4.98, 4.91],
+          backgroundColor: 'rgba(1, 105, 111, 0.7)',
+        },
+        {
+          label: 'Rendement net (%)',
+          data: [3.21, 3.10, 3.04],
+          backgroundColor: 'rgba(67, 122, 34, 0.7)',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: {
+          display: true,
+          text: 'Comparaison des rendements par scénario'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { callback: val => val + ' %' }
+        }
+      }
+    }
+  });
+}
+
 
 // ── DASHBOARD ─────────────────────────────────────────
 function renderDashboard() {
@@ -202,7 +265,7 @@ function renderBanques() {
       <td>${i + 1}</td>
       <td><strong>${b.nom}</strong></td>
       <td>
-        <select onchange="DATA.banques[${i}].statut = this.value">
+        <select onchange="DATA.banques[${i}].statut = this.value; save()">
           ${statutOptions.map(o => `<option${o === b.statut ? ' selected' : ''}>${o}</option>`).join('')}
         </select>
       </td>
@@ -327,7 +390,7 @@ function renderAnalyse() {
     <td>${fmt(revente3)} (+${fmt(pv3)})</td>
     <td>${fmt(revente5)} (+${fmt(pv5)})</td>
   </tr>`;
-}).join('');
+  }).join('');
 
 return `
   <h1 class="section-title">📊 Analyse Financière</h1>
@@ -340,6 +403,9 @@ return `
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>
+  <div style="max-width:600px; margin: 2rem auto;">
+    <canvas id="chartAnalyse"></canvas>
+  </div>
 `;
 
 }
@@ -354,7 +420,7 @@ function renderDocuments() {
       <td>${d.doc}</td>
       <td><span style="font-size:0.8125rem;color:var(--text-muted)">${d.cat}</span></td>
       <td>
-        <select onchange="DATA.documents[${d.id - 1}].statut = this.value">
+        <select onchange="DATA.documents[${d.id - 1}].statut = this.value; save()">
           ${statutOptions.map(o =>
             `<option ${o === d.statut ? 'selected' : ''}>${o}</option>`
           ).join('')}
@@ -404,7 +470,7 @@ function renderCalendrier() {
       <td style="color:var(--text-muted)">${e.cible}</td>
       <td><input type="date" style="width:140px" /></td>
       <td>
-        <select onchange="DATA.calendrier[${e.id - 1}].statut = this.value">
+        <select onchange="DATA.calendrier[${e.id - 1}].statut = this.value; save()">
           ${statutOptions.map(o =>
             `<option ${o === e.statut ? 'selected' : ''}>${o}</option>`
           ).join('')}
@@ -533,6 +599,7 @@ function render(section) {
     copro      : renderCopro,
   };
   app.innerHTML = sections[section] ? sections[section]() : '<p>Section introuvable</p>';
+  if (section === 'analyse') initChartAnalyse();
 }
 
 
