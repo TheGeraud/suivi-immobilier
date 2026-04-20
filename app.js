@@ -276,6 +276,7 @@ function renderBiens() {
 // - éventuellement meilleur taux proposé
 // - afficher plus tard le meilleur taux via tauxValue
 // - etre plus soubple sur le valeur de taux (ex: 3.5 ou 3,5 ou 3,50) et convertir en nombre pour comparaison ou calculs futurs
+// - rester sur la même page après une actualisation (ex: après avoir entré un taux ou changé un statut) au lieu de revenir au dashboard
 
 
 // ── BANQUES ──────────────────────────────────────────
@@ -483,21 +484,21 @@ function renderCalendrier() {
 
   const statutOptions = ['⬜ À faire', '🔄 En cours', '✅ Fait', '⚠️ Bloqué'];
 
-  const rows = DATA.calendrier.map(e => `
+  const rows = DATA.calendrier.map((e,i) => `
     <tr>
       <td style="color:var(--text-muted);font-size:0.8125rem">${e.id}</td>
       <td>${e.etape}</td>
       <td><span class="badge ${phaseColors[e.phase] || 'badge-todo'}">${e.phase}</span></td>
       <td style="color:var(--text-muted)">${e.cible}</td>
-      <td><input type="date" style="width:140px" /></td>
+      <td><input type="date" value="${e.date || ''}" oninput="DATA.calendrier[${i}].dateReelle = this.value; save()" style="width:140px" /></td>
       <td>
-        <select onchange="DATA.calendrier[${e.id - 1}].statut = this.value; save()">
+        <select onchange="DATA.calendrier[${i}].statut = this.value; save()">
           ${statutOptions.map(o =>
             `<option ${o === e.statut ? 'selected' : ''}>${o}</option>`
           ).join('')}
         </select>
       </td>
-      <td><input placeholder="Notes..." style="width:160px" /></td>
+      <td><input type="text" placeholder="Notes..." value="${e.notes || ''}" oninput="DATA.calendrier[${i}].notes = this.value; saveDebounced()" style="width:160px" /></td>
     </tr>
   `).join('');
 
