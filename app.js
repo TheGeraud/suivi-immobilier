@@ -41,15 +41,15 @@ const DATA = {
   },
 
   banques: [
-    { nom: 'BNP Paribas',       statut: 'À contacter' },
-    { nom: 'Crédit Agricole',   statut: 'À contacter' },
-    { nom: 'Société Générale',  statut: 'À contacter' },
-    { nom: 'LCL',               statut: 'À contacter' },
-    { nom: "Caisse d'Épargne",  statut: 'À contacter' },
-    { nom: 'Boursorama',        statut: 'À contacter' },
-    { nom: 'Hello Bank',        statut: 'À contacter' },
-    { nom: 'Courtier (à définir)', statut: 'À contacter' },
-  ],
+  { nom: 'BNP Paribas', statut: 'À contacter', taux: '', notes: '' },
+  { nom: 'Crédit Agricole', statut: 'À contacter', taux: '', notes: '' },
+  { nom: 'Société Générale', statut: 'À contacter', taux: '', notes: '' },
+  { nom: 'LCL', statut: 'À contacter', taux: '', notes: '' },
+  { nom: "Caisse d'Épargne", statut: 'À contacter', taux: '', notes: '' },
+  { nom: 'Boursorama', statut: 'À contacter', taux: '', notes: '' },
+  { nom: 'Hello Bank', statut: 'À contacter', taux: '', notes: '' },
+  { nom: 'Courtier (à définir)', statut: 'À contacter', taux: '', notes: '' },
+],
 
   documents: [
     { id:1,  doc:"Pièce d'identité (CNI ou passeport)",      cat:'Identité',        statut:'⬜ À faire' },
@@ -126,7 +126,16 @@ if (saved) {
 function save() {
   localStorage.setItem('suiviImmo', JSON.stringify(DATA)); //Cette fonction enregistre l’objet  DATA  dans le navigateur.  JSON.stringify()  transforme l’objet JavaScript en texte, car  localStorage  ne peut stocker que des chaînes de caractères.
 }
+// ── DEBOUNCE ─────────────────────────────────────────
+function debounce(fn, delay = 400) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
 
+const saveDebounced = debounce(save, 400);
 // ── UTILITAIRES ───────────────────────────────────────
 function fmt(n) {
   return Number(n).toLocaleString('fr-FR') + ' €';
@@ -201,7 +210,6 @@ function initChartAnalyse() {
 }
 
 
-
 // ── DASHBOARD ─────────────────────────────────────────
 function renderDashboard() {
   const b = DATA.bien;
@@ -262,27 +270,35 @@ function renderBiens() {
   `;
 }
 
+// TODO Banques : ajouter plus tard un mini résumé
+// - nombre d'offres reçues
+// - nombre d'offres acceptées
+// - éventuellement meilleur taux proposé
+// - afficher plus tard le meilleur taux via tauxValue
+// - etre plus soubple sur le valeur de taux (ex: 3.5 ou 3,5 ou 3,50) et convertir en nombre pour comparaison ou calculs futurs
+
+
 // ── BANQUES ──────────────────────────────────────────
 function renderBanques() {
   const statutOptions = ['À contacter', 'En attente', 'Offre reçue', 'Accepté', 'Refusé'];
   const rows = DATA.banques.map((b, i) => `
     <tr>
-      <td>${i + 1}</td>
+      <td>${i + 1}</td> 
       <td><strong>${b.nom}</strong></td>
       <td>
         <select onchange="DATA.banques[${i}].statut = this.value; save()">
           ${statutOptions.map(o => `<option${o === b.statut ? ' selected' : ''}>${o}</option>`).join('')}
         </select>
       </td>
-      <td><input placeholder="Taux proposé..." style="width:120px"></td>
-      <td><input placeholder="Notes..." style="width:160px"></td>
+      <td><input type="number" placeholder="EX 3.54" value="${b.taux || ''}" oninput="DATA.banques[${i}].taux = this.value; saveDebounced()" style="width:120px" step="0.01" min="0"></td>
+      <td><input type="text" placeholder="Notes..." value="${b.notes || ''}" oninput="DATA.banques[${i}].notes = this.value; saveDebounced()" style="width:220px"></td>
     </tr>`).join('');
   return `
     <h1 class="section-title">🏦 Banques & Financement</h1>
     <p class="section-sub">Suivi des démarches bancaires</p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Banque</th><th>Statut</th><th>Taux</th><th>Notes</th></tr></thead>
+        <thead><tr><th>#</th><th>Banque</th><th>Statut</th><th>Taux(%)</th><th>Notes</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
