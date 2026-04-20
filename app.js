@@ -435,19 +435,19 @@ return `
 function renderDocuments() {
   const statutOptions = ['⬜ À faire', '🔄 En cours', '✅ Fourni', '❌ Non applicable'];
 
-  const rows = DATA.documents.map(d => `
+  const rows = DATA.documents.map((d,i) => `
     <tr>
       <td style="color:var(--text-muted);font-size:0.8125rem">${d.id}</td>
       <td>${d.doc}</td>
       <td><span style="font-size:0.8125rem;color:var(--text-muted)">${d.cat}</span></td>
       <td>
-        <select onchange="DATA.documents[${d.id - 1}].statut = this.value; save()">
+        <select onchange="DATA.documents[${i}].statut = this.value; save()">
           ${statutOptions.map(o =>
             `<option ${o === d.statut ? 'selected' : ''}>${o}</option>`
           ).join('')}
         </select>
       </td>
-      <td><input placeholder="Notes..." style="width:180px" /></td>
+      <td><input type="text" placeholder="Notes..." value="${d.notes || ''}" oninput="DATA.documents[${i}].notes = this.value; saveDebounced()" style="width:180px" /></td>
     </tr>
   `).join('');
 
