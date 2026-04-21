@@ -176,7 +176,14 @@ const saveDebounced = debounce(save, 400);
 // ── UTILITAIRES ───────────────────────────────────────
 function fmt(n) {
   return Number(n).toLocaleString('fr-FR') + ' €';
-}//
+}
+
+function formatDateFr(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;//d.getTime() retourne le nombre de millisecondes depuis 1970, ou NaN si la date est invalide.
+  return d.toLocaleDateString('fr-FR');
+}
 
 function badgeStatut(statut) {
   const map = {
@@ -255,10 +262,10 @@ function renderDashboard() {
   const rendBrut = ((b.loyer * 12) / b.prixOffert * 100).toFixed(2);
   const docsFaits = DATA.documents.filter(d => d.statut === '✅ Fourni').length;
   const etapesFaites = DATA.calendrier.filter(e => e.statut === '✅ Fait').length;
-
+  const dateDashboard = getDateBase() || DATA.calendrier[0]?.cible || 'Non définie';
   return `
     <h1 class="section-title">🏠 Tableau de bord</h1>
-    <p class="section-sub">${b.adresse} · Budget max 150 000 € · 16/04/2026</p>
+    <p class="section-sub">${b.adresse} · Budget max 150 000 € · ${formatDateFr(dateDashboard) || 'Non définie'}</p>
     <div class="kpi-grid">
       <div class="kpi-card"><div class="kpi-label">Prix offert</div><div class="kpi-value">${fmt(b.prixOffert)}</div><div class="kpi-note">Demande : ${fmt(b.prixDemande)}</div></div>
       <div class="kpi-card"><div class="kpi-label">Prix / m²</div><div class="kpi-value">${fmt(prixM2)}</div><div class="kpi-note">${b.surface} m²</div></div>
@@ -307,13 +314,16 @@ function renderBiens() {
   `;
 }
 
+// boutons pour modifier les valeurs du bien (prix offert, statut, notes...)
+// ajouter un bouton permettant d'ouvrir une fenêtre d'ajout d'un nouveau bien (avec les champs adresse, surface, prix demandé, prix offert, statut, notes...)
+// ajouetr une liste déroulante des différents biens ajoutés et afficher les infos du bien sélectionné dans la table
 // TODO Banques : ajouter plus tard un mini résumé
 // - nombre d'offres reçues
 // - nombre d'offres acceptées
 // - éventuellement meilleur taux proposé
 // - afficher plus tard le meilleur taux via tauxValue
 // - etre plus soubple sur le valeur de taux (ex: 3.5 ou 3,5 ou 3,50) et convertir en nombre pour comparaison ou calculs futurs
-// - rester sur la même page après une actualisation (ex: après avoir entré un taux ou changé un statut) au lieu de revenir au dashboard
+// - ajouter un bouton pour rajouter une banque personnalisée (avec nom, statut, taux, notes)
 // TODO : rendre les délais du calendrier ajustables par l'utilisateur
 
 
