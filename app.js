@@ -37,7 +37,8 @@ const DATA = {
     agence:     'IDLR / BINAME Elisa',
     statut:     'Offre envoyée',
     avis:       '★★★☆☆',
-    notes:      'Copro : travaux toiture/assainissement (PV 2023-2025)'
+    notes:      'Copro : travaux toiture/assainissement (PV 2023-2025)',
+    dateVisite: '2026-04-12', // Nouvelle propriété pour stocker la date de visite du bien
   },
 
   banques: [
@@ -72,22 +73,22 @@ const DATA = {
   ],
 
   calendrier: [
-    { id:1,  etape:"Envoi offre d'achat",            phase:'Négociation', cible:'Avr 2026', statut:'⬜ À faire' },
-    { id:2,  etape:'Réponse vendeur / contre-offre', phase:'Négociation', cible:'Avr 2026', statut:'⬜ À faire' },
-    { id:3,  etape:'Accord sur le prix',             phase:'Négociation', cible:'Avr 2026', statut:'⬜ À faire' },
-    { id:4,  etape:'Consultation banques / courtier',phase:'Financement', cible:'Avr–Mai 2026', statut:'⬜ À faire' },
-    { id:5,  etape:'Dépôt dossier de prêt',          phase:'Financement', cible:'Mai 2026', statut:'⬜ À faire' },
-    { id:6,  etape:'Accord de principe',             phase:'Financement', cible:'Mai 2026', statut:'⬜ À faire' },
-    { id:7,  etape:'Offre de prêt officielle reçue', phase:'Financement', cible:'Juin 2026', statut:'⬜ À faire' },
-    { id:8,  etape:'Délai de réflexion légal (10j)', phase:'Financement', cible:'Juin 2026', statut:'⬜ À faire' },
-    { id:9,  etape:'Signature compromis de vente',   phase:'Notaire',     cible:'Mai 2026', statut:'⬜ À faire' },
-    { id:10, etape:'Délai rétractation (10 jours)',  phase:'Notaire',     cible:'Mai 2026', statut:'⬜ À faire' },
-    { id:11, etape:'Dépôt de garantie (~5–10%)',     phase:'Notaire',     cible:'Mai 2026', statut:'⬜ À faire' },
-    { id:12, etape:'Purge conditions suspensives',   phase:'Notaire',     cible:'Juin–Juil 2026', statut:'⬜ À faire' },
-    { id:13, etape:'Signature acte authentique',     phase:'Notaire',     cible:'Juil–Août 2026', statut:'⬜ À faire' },
-    { id:14, etape:'Remise des clés',                phase:'Finalisation',cible:'Juil–Août 2026', statut:'⬜ À faire' },
-    { id:15, etape:'Souscription assurance habitation',phase:'Finalisation',cible:'Avant clés', statut:'⬜ À faire' },
-    { id:16, etape:'Changement compteurs EDF / eau', phase:'Finalisation',cible:'Dès remise clés', statut:'⬜ À faire' },
+    { id:1,  etape:"Envoi offre d'achat",            phase:'Négociation', cible:'Avr 2026', statut:'⬜ À faire', delai: 2 },
+    { id:2,  etape:'Réponse vendeur / contre-offre', phase:'Négociation', cible:'Avr 2026', statut:'⬜ À faire', delai: 7 },
+    { id:3,  etape:'Accord sur le prix',             phase:'Négociation', cible:'Avr 2026', statut:'⬜ À faire', delai: 10 }, 
+    { id:4,  etape:'Consultation banques / courtier',phase:'Financement', cible:'Avr–Mai 2026', statut:'⬜ À faire', delai: 14 },
+    { id:5,  etape:'Dépôt dossier de prêt',          phase:'Financement', cible:'Mai 2026', statut:'⬜ À faire', delai: 45 },
+    { id:6,  etape:'Accord de principe',             phase:'Financement', cible:'Mai 2026', statut:'⬜ À faire', delai: 60 },
+    { id:7,  etape:'Offre de prêt officielle reçue', phase:'Financement', cible:'Juin 2026', statut:'⬜ À faire', delai: 75 },
+    { id:8,  etape:'Délai de réflexion légal (10j)', phase:'Financement', cible:'Juin 2026', statut:'⬜ À faire', delai: 85 },
+    { id:9,  etape:'Signature compromis de vente',   phase:'Notaire',     cible:'Mai 2026', statut:'⬜ À faire', delai: 30 },
+    { id:10, etape:'Délai rétractation (10 jours)',  phase:'Notaire',     cible:'Mai 2026', statut:'⬜ À faire', delai: 40 },
+    { id:11, etape:'Dépôt de garantie (~5–10%)',     phase:'Notaire',     cible:'Mai 2026', statut:'⬜ À faire', delai: 42 },
+    { id:12, etape:'Purge conditions suspensives',   phase:'Notaire',     cible:'Juin–Juil 2026', statut:'⬜ À faire', delai: 90 },
+    { id:13, etape:'Signature acte authentique',     phase:'Notaire',     cible:'Juil–Août 2026', statut:'⬜ À faire', delai: 120 },
+    { id:14, etape:'Remise des clés',                phase:'Finalisation',cible:'Juil–Août 2026', statut:'⬜ À faire', delai: 121 },
+    { id:15, etape:'Souscription assurance habitation',phase:'Finalisation',cible:'Avant clés', statut:'⬜ À faire', delai: 115 },
+    { id:16, etape:'Changement compteurs EDF / eau', phase:'Finalisation',cible:'Dès remise clés', statut:'⬜ À faire', delai: 122 },
   ],
 
   contacts: [
@@ -115,13 +116,45 @@ const DATA = {
 // ── CHARGEMENT SAUVEGARDE ────────────────────────────
 const saved = localStorage.getItem('suiviImmo');
 if (saved) {
-  const parsed = JSON.parse(saved);// Cette ligne lit les données sauvegardées dans le navigateur et les transforme de texte en objet JavaScript.
-  Object.assign(DATA.bien, parsed.bien || {});// Résultat : seuls les champs modifiés sont mis à jour, les autres restent avec leurs valeurs par défaut. Pratique pour ajouter de nouveaux champs dans DATA sans écraser les anciennes données.
-  DATA.banques    = parsed.banques    || DATA.banques;
-  DATA.documents  = parsed.documents  || DATA.documents;
-  DATA.calendrier = parsed.calendrier || DATA.calendrier;
-  DATA.contacts   = parsed.contacts   || DATA.contacts;
+  const parsed = JSON.parse(saved);
+
+  // Merge bien
+  Object.assign(DATA.bien, parsed.bien || {});
+
+  // Banques : merge pour protéger les nouveaux champs du code
+  if (parsed.banques) {
+    DATA.banques = parsed.banques.map((e, i) => ({
+      ...DATA.banques[i], // valeurs par défaut (nom, statut...)
+      ...e                // valeurs user par-dessus (statut modifié, notes...)
+    }));
+  }
+
+  // Documents : merge
+  if (parsed.documents) {
+    DATA.documents = parsed.documents.map((e, i) => ({
+      ...DATA.documents[i],
+      ...e
+    }));
+  }
+
+  // Calendrier : merge
+  if (parsed.calendrier) {
+    DATA.calendrier = parsed.calendrier.map((e, i) => ({
+      ...DATA.calendrier[i],
+      ...e
+    }));
+  }
+
+  // Contacts : merge
+  if (parsed.contacts) {
+    DATA.contacts = parsed.contacts.map((e, i) => ({
+      ...DATA.contacts[i], // valeurs par défaut (role, societe...)
+      ...e                 // valeurs user par-dessus (tel, email, notes...)
+    }));
+  }
 }
+
+
 
 function save() {
   localStorage.setItem('suiviImmo', JSON.stringify(DATA)); //Cette fonction enregistre l’objet  DATA  dans le navigateur.  JSON.stringify()  transforme l’objet JavaScript en texte, car  localStorage  ne peut stocker que des chaînes de caractères.
@@ -277,6 +310,7 @@ function renderBiens() {
 // - afficher plus tard le meilleur taux via tauxValue
 // - etre plus soubple sur le valeur de taux (ex: 3.5 ou 3,5 ou 3,50) et convertir en nombre pour comparaison ou calculs futurs
 // - rester sur la même page après une actualisation (ex: après avoir entré un taux ou changé un statut) au lieu de revenir au dashboard
+// TODO : rendre les délais du calendrier ajustables par l'utilisateur
 
 
 // ── BANQUES ──────────────────────────────────────────
@@ -473,6 +507,15 @@ function renderDocuments() {
   `;
 }
 
+// Calcul d'une date prévisionnelle en ajoutant un nombre de jours à la date de visite.
+function calculerDatePrevi(dateVisite, joursOffset) {
+  if (!dateVisite) return '';
+  const d = new Date(dateVisite);
+   if (isNaN(d.getTime())) return '';
+  d.setDate(d.getDate() + joursOffset);
+  return d.toLocaleDateString('fr-FR');
+}
+
 // ── CALENDRIER ────────────────────────────────────────
 function renderCalendrier() {
   const phaseColors = {
@@ -485,12 +528,13 @@ function renderCalendrier() {
   const statutOptions = ['⬜ À faire', '🔄 En cours', '✅ Fait', '⚠️ Bloqué'];
 
   const rows = DATA.calendrier.map((e,i) => `
+  
     <tr>
       <td style="color:var(--text-muted);font-size:0.8125rem">${e.id}</td>
       <td>${e.etape}</td>
       <td><span class="badge ${phaseColors[e.phase] || 'badge-todo'}">${e.phase}</span></td>
-      <td style="color:var(--text-muted)">${e.cible}</td>
-      <td><input type="date" value="${e.date || ''}" oninput="DATA.calendrier[${i}].dateReelle = this.value; save()" style="width:140px" /></td>
+      <td style="color:var(--text-muted)">${calculerDatePrevi(DATA.bien.dateVisite, e.delai) || e.cible}</td>
+      <td><input type="date" value="${e.dateReelle || ''}" oninput="DATA.calendrier[${i}].dateReelle = this.value; save()" style="width:140px" /></td>
       <td>
         <select onchange="DATA.calendrier[${i}].statut = this.value; save()">
           ${statutOptions.map(o =>
@@ -512,6 +556,25 @@ function renderCalendrier() {
       Offre → Compromis → Financement → Clés · ~3 à 4 mois ·
       <strong style="color:var(--primary)">${faites}/${total} complétées (${pct} %)</strong>
     </p>
+
+        <div style="margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem">
+      <label style="font-weight:600">📅 Date de visite :</label>
+      <input
+        type="date"
+        value="${DATA.bien.dateVisite || ''}"
+        onchange="DATA.bien.dateVisite = this.value; save(); render('calendrier')"
+        style="width:160px"
+      />
+      ${DATA.bien.dateVisite
+        ? `<span style="color:var(--text-muted);font-size:0.875rem">
+            Dates prévisionnelles calculées depuis le ${new Date(DATA.bien.dateVisite).toLocaleDateString('fr-FR')}
+           </span>`
+        : `<span style="color:var(--text-muted);font-size:0.875rem">
+            Entrez la date de visite pour calculer les dates prévisionnelles
+           </span>`
+      }
+    </div>
+
     <div class="table-wrap">
       <table>
         <thead><tr>
