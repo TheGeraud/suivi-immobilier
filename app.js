@@ -672,6 +672,7 @@ function renderCopro() {
 
 // ── RENDER PRINCIPAL ──────────────────────────────────
 function render(section) {
+  sessionStorage.setItem('activeSection', section);// Sauvegarde de la section active dans le sessionStorage pour persistance lors du rafraîchissement de la page
   const sections = {
     dashboard  : renderDashboard,
     biens      : renderBiens,
@@ -689,4 +690,11 @@ function render(section) {
 
 
 // ── DÉMARRAGE ─────────────────────────────────────────
-render('dashboard');
+const lastSection = sessionStorage.getItem('activeSection') || 'dashboard';
+render(lastSection);
+
+// Mettre le bouton nav actif correspondant
+navBtns.forEach(b => {
+  if (b.dataset.section === lastSection) b.classList.add('active');
+  else b.classList.remove('active');
+});
